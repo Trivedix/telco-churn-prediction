@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Dashboard | ChurnGuard AI</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">
+      <i class="fa-solid fa-tower-broadcast me-2"></i>ChurnGuard AI
+    </a>
+    <a href="/" class="btn btn-outline-light btn-sm ms-auto">
+      <i class="fa-solid fa-arrow-left me-1"></i> Back to Predictor
+    </a>
+  </div>
+</nav>
+
+<header class="hero-section text-center py-5">
+  <div class="container">
+    <h1 class="hero-title">Model Performance Dashboard</h1>
+    <p class="hero-subtitle">A transparent look at how the churn prediction model was trained & evaluated.</p>
+  </div>
+  <div class="hero-wave"></div>
+</header>
+
+<main class="container my-5">
+
+  {% if metrics %}
+  <h3 class="mb-4"><i class="fa-solid fa-trophy text-gradient me-2"></i>Best Model: {{ metrics.best_model }}</h3>
+
+  <div class="row g-4 mb-5">
+    {% for model_name, m in metrics.all_metrics.items() %}
+    <div class="col-md-4">
+      <div class="glass-card p-4 h-100 {% if model_name == metrics.best_model %}best-model-card{% endif %}">
+        <h5 class="mb-3">{{ model_name }}
+          {% if model_name == metrics.best_model %}<i class="fa-solid fa-star text-warning"></i>{% endif %}
+        </h5>
+        <ul class="list-unstyled metric-list">
+          <li><span>Accuracy</span><strong>{{ "%.2f"|format(m.accuracy * 100) }}%</strong></li>
+          <li><span>Precision</span><strong>{{ "%.2f"|format(m.precision * 100) }}%</strong></li>
+          <li><span>Recall</span><strong>{{ "%.2f"|format(m.recall * 100) }}%</strong></li>
+          <li><span>F1 Score</span><strong>{{ "%.2f"|format(m.f1_score * 100) }}%</strong></li>
+          <li><span>ROC-AUC</span><strong>{{ "%.2f"|format(m.roc_auc * 100) }}%</strong></li>
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-warning">
+    Model not trained yet. Run <code>clean.py</code> then <code>train.py</code> to see metrics here.
+  </div>
+  {% endif %}
+
+  <h3 class="mb-4"><i class="fa-solid fa-chart-pie text-gradient me-2"></i>Exploratory Data Analysis</h3>
+  <div class="row g-4">
+    {% if plots %}
+      {% for plot in plots %}
+      <div class="col-md-6">
+        <div class="glass-card p-3">
+          <img src="{{ url_for('static', filename='plots/' + plot) }}" class="img-fluid rounded" alt="{{ plot }}">
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-warning">Run <code>eda.py</code> to generate plots here.</div>
+    {% endif %}
+  </div>
+
+</main>
+
+<footer class="text-center py-4 footer-section">
+  <p class="mb-0">© 2026 ChurnGuard AI — Telecom Customer Churn Prediction System</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
